@@ -79,6 +79,12 @@
     <Compile Include="Moduls\GetTextField.Designer.cs">
       <DependentUpon>GetTextField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Moduls\InsertDataFromPicture.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Moduls\InsertDataFromPicture.Designer.cs">
+      <DependentUpon>InsertDataFromPicture.cs</DependentUpon>
+    </Compile>
     <Compile Include="Moduls\RegisterCustomer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -103,6 +109,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Moduls\GetTextField.resx">
       <DependentUpon>GetTextField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Moduls\InsertDataFromPicture.resx">
+      <DependentUpon>InsertDataFromPicture.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Moduls\RegisterCustomer.resx">
       <DependentUpon>RegisterCustomer.cs</DependentUpon>

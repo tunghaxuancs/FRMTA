@@ -1,4 +1,14 @@
-﻿using Emgu.CV;
+﻿/******************************************************************************
+*   by Ha Xuan Tung
+*   Email: tung.haxuancs@gmail.com
+******************************************************************************
+*   Please don't clear this comments
+*   Copyright MTA 2017.
+*   Learn more in site: https://sites.google.com/site/ictw666/
+*   Youtube channel: https://goo.gl/Caj8Gj
+*****************************************************************************/
+
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System;
 using System.Drawing;
@@ -90,7 +100,7 @@ namespace FR.Client.Scripts
         {
             Size minFeatureSize;
             if (isCamera) minFeatureSize = new Size(70, 70);
-            else minFeatureSize = new Size(40, 40);
+            else minFeatureSize = new Size(20, 20);
             float searchScaleFactor = 1.1f;
             int minNeighbors = 5;
 

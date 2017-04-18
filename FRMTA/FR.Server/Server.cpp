@@ -160,10 +160,13 @@ void ReceiverSocket::ProcessPacket()
 	{
 		if (incomingMessages.empty()) continue;
 		MessageData message = incomingMessages.pop();
-		std::string path = "data\\face\\train";
+		std::string pathTrain = "data\\face\\train";
+		std::string pathReport = "data\\face\\report";
 		MessageData messageSend;
 		float maxPredict = -1;
 		int maxIndex = 0;
+		std::string infor;
+
 		switch (message.typeConnect)
 		{
 		case Login:
@@ -172,10 +175,10 @@ void ReceiverSocket::ProcessPacket()
 			SendPacket(messageSend, message.clientName);
 			break;
 		case Train:
-			if (CreateDirectoryA((path + "\\" + message.clientName).c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+			if (CreateDirectoryA((pathTrain + "\\" + message.clientName).c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
 			{
 				std::cout << "Create folder success!" << std::endl;
-				std::string temp = path + "\\" + message.clientName;
+				std::string temp = pathTrain + "\\" + message.clientName;
 				cv::imwrite(temp + "\\" + message.clientName + "." + std::to_string(++index) + ".png", message.message);
 			}
 			else
@@ -199,6 +202,23 @@ void ReceiverSocket::ProcessPacket()
 
 			messageSend.clientName = getName(directories.at(maxIndex));
 			SendPacket(messageSend, message.clientName);
+			break;
+		case Report:
+			infor = message.clientName.substr(message.clientName.find_first_of('%') + 1);
+			if (CreateDirectoryA((pathReport + "\\" + infor).c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+			{
+				std::cout << "Create folder report success!" << std::endl;
+				std::string temp = pathReport + "\\" + infor;
+				cv::imwrite(temp + "\\report.png", message.message);
+
+				std::ofstream reportText(temp + "\\report.txt");
+				reportText << message.clientName;
+				reportText.close();
+			}
+			else
+			{
+				std::cout << "Create folder error!" << std::endl;
+			}
 			break;
 		default:
 			break;

@@ -222,19 +222,24 @@ void loadModels(cv::Ptr<cv::ml::ANN_MLP>& mlp, cv::Mat& vocabulary,
 KAZERecognizor::KAZERecognizor()
 {
 }
+inline bool checkFileExist(const std::string& name)
+{
+	struct stat buffer;
+	return (stat(name.c_str(), &buffer) == 0);
+}
 
 KAZERecognizor::KAZERecognizor(std::string path)
 {
 	pathImage = path;
-	if (mlp == NULL)
+	if (!checkFileExist(pathImage + "//mlp.yml"))
+	{
+		Train(pathImage, 32);
+	}
+	else
 	{
 		loadModels(mlp, vocabulary, classes, pathImage);
 		flann.add(vocabulary);
 		flann.train();
-	}
-	if (mlp == NULL)
-	{
-		Train(pathImage, 32);
 	}
 }
 

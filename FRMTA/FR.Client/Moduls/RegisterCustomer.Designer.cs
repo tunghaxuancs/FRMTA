@@ -148,7 +148,7 @@
             this.txtBirthday.Size = new System.Drawing.Size(397, 20);
             this.txtBirthday.StyleController = this.layoutControl1;
             this.txtBirthday.TabIndex = 6;
-            this.txtBirthday.Tag = "*";
+            this.txtBirthday.Tag = "";
             // 
             // layoutControlGroup1
             // 
@@ -193,8 +193,8 @@
             this.layoutControlItem3.Location = new System.Drawing.Point(0, 48);
             this.layoutControlItem3.Name = "layoutControlItem3";
             this.layoutControlItem3.Size = new System.Drawing.Size(467, 24);
-            this.layoutControlItem3.Tag = "*";
-            this.layoutControlItem3.Text = "Birthday (*)";
+            this.layoutControlItem3.Tag = "";
+            this.layoutControlItem3.Text = "Birthday";
             this.layoutControlItem3.TextSize = new System.Drawing.Size(63, 13);
             // 
             // layoutControlItem4

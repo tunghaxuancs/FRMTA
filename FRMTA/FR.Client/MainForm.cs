@@ -51,6 +51,7 @@ namespace FR.Client
         private BindingList<Record> listDataSource;
 
         private bool isSave;
+        private int isLoadDataView;
 
         private Socket clientSocket;
         private string clientName;
@@ -105,6 +106,7 @@ namespace FR.Client
                                    new Size(HelperFeature.Camera_Width,
                                    HelperFeature.Camera_Height),
                                    true);
+            isLoadDataView = 10;
         }
 
         private void InitDirectories()
@@ -184,7 +186,7 @@ namespace FR.Client
 
             faceData = fdh.GetPreprocessedFace(displayCameraFrame,
                           HelperFeature.faceWidth, HelperFeature.faceHeight,
-                          cascade, eyeCascade1, eyeCascade2, true, false);
+                          cascade, eyeCascade1, eyeCascade2, false, true);
 
             ibMain.Image = displayCameraFrame;
 
@@ -196,34 +198,39 @@ namespace FR.Client
         {
             lbFPSCamera.Text = "FPS:" + FPS_Count.ToString();
             FPS_Count = 0;
+            isLoadDataView++;
 
             if (fdh.faceRect != null && faceData != null && faceData.Length == fdh.faceRect.Length && mode != AppMode.Logout)
             {
                 for (int i = 0; i < fdh.faceRect.Length; i++)
                 {
-                    Mat face = new Mat(currentCameraFrame, fdh.faceRect[i]);
-                    CvInvoke.Resize(face, face, new Size(HelperFeature.faceWidth, HelperFeature.faceHeight));
-
-                    if (isSave)
+                    lock (currentCameraFrame)
                     {
-                        face.Save(HelperFeature.pathSaveImage + DateTime.Now.ToFileTime() + ".png");
-                    }
+                        Mat face = new Mat(currentCameraFrame, fdh.faceRect[i]);
+                        CvInvoke.Resize(face, face, new Size(HelperFeature.faceWidth, HelperFeature.faceHeight));
 
-                    if (faceData[i] != null && mode == AppMode.Predict)
-                    {
-                        DataMessage msgToSend = new DataMessage();
-                        msgToSend.clientName = this.clientName;
-                        msgToSend.message = faceData[i];
-                        msgToSend.typeConnect = TypeConnect.Predict;
-                        SendMessage(msgToSend);
+                        if (isSave)
+                        {
+                            face.Save(HelperFeature.pathSaveImage + DateTime.Now.ToFileTime() + ".png");
+                        }
 
-                        if (currentPredict == null) currentPredict = new Mat();
-                        Record faceRecord = new Record(++numRecord, face.Bitmap, currentPredict.Bitmap, faceData[i].Bitmap, currentInfo);
-                        listDataSource.Add(faceRecord);
-                        currentInfo = string.Empty;
-                        currentPredict = new Mat();
+                        if (faceData[i] != null && mode == AppMode.Predict)
+                        {
+                            DataMessage msgToSend = new DataMessage();
+                            msgToSend.clientName = this.clientName;
+                            msgToSend.message = faceData[i];
+                            msgToSend.typeConnect = TypeConnect.Predict;
+                            SendMessage(msgToSend);
+
+                            if (currentPredict == null) currentPredict = new Mat();
+                            Record faceRecord = new Record(++numRecord, face.Bitmap, currentPredict.Bitmap, faceData[i].Bitmap, currentInfo);
+                            if (listDataSource.Count > 100) listDataSource.RemoveAt(0);
+                            listDataSource.Add(faceRecord);
+                            currentInfo = string.Empty;
+                            currentPredict = new Mat();
+                        }
+                        else continue;
                     }
-                    else continue;
                 }
             }
         }
@@ -299,7 +306,7 @@ namespace FR.Client
                         {
                             int.Parse(_msgReceived.clientName);
                             DataTable customer = cusRepo.SelectData("ID='" + _msgReceived.clientName + "'");
-                            currentInfo = customer.Rows[0]["FullName"].ToString() + "\n" + customer.Rows[0]["Address"].ToString();
+                            currentInfo = customer.Rows[0]["FullName"].ToString() + "\n\n" + customer.Rows[0]["Address"].ToString();
                             string pathTemp = HelperFeature.pathSaveImage + _msgReceived.clientName + "/avatar.png";
                             if (File.Exists(pathTemp)) currentPredict = CvInvoke.Imread(pathTemp, ImreadModes.Color);
                         }
@@ -403,7 +410,7 @@ namespace FR.Client
                     {
                         Image<Gray, Byte> imageCV = new Image<Gray, byte>(selectedRows[i].DetectImg);
                         DataMessage msgToSend = new DataMessage();
-                        msgToSend.clientName = selectedRows[i].Info + "%";
+                        msgToSend.clientName = selectedRows[i].Info + "%" + frmText.TextField;
                         msgToSend.message = imageCV.Mat;
                         msgToSend.typeConnect = TypeConnect.Report;
 
@@ -420,9 +427,22 @@ namespace FR.Client
             showNewestRow();
         }
 
+        private void gridView1_Click(object sender, EventArgs e)
+        {
+            isLoadDataView = 0;
+        }
+
+        private void barButtonItem12_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            InsertDataFromPicture temp = new InsertDataFromPicture();
+            mode = AppMode.Logout;
+            temp.ShowDialog();
+            mode = AppMode.Predict;
+        }
+
         private void showNewestRow()
         {
-            if (gridView1.GetSelectedRows().Length > 0) return;
+            if (gridView1.GetSelectedRows().Length > 0 || isLoadDataView < 10) return;
 
             int value = gridView1.RowCount - 1;
             gridView1.TopRowIndex = value;

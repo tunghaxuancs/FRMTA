@@ -21,8 +21,8 @@ namespace FR.Client
 
     public class HelperFeature
     {
-        public const int DESIRED_CAMERA_WIDTH = 640;
-        public const int DESIRED_CAMERA_HEIGHT = 480;
+        public const int DESIRED_CAMERA_WIDTH = 1280;
+        public const int DESIRED_CAMERA_HEIGHT = 720;
 
         public const double DESIRED_LEFT_EYE_X = 0.22;
         public const double DESIRED_LEFT_EYE_Y = 0.14;
@@ -30,8 +30,8 @@ namespace FR.Client
         public const double FACE_ELLIPSE_W = 0.50;
         public const double FACE_ELLIPSE_H = 0.80;
 
-        public const int faceWidth = 90;
-        public const int faceHeight = 90;
+        public const int faceWidth = 70;
+        public const int faceHeight = 70;
 
         public static string pathSaveImage = "data/face/";
         public static string pathSaveVideo = "data/video/";
