@@ -1,5 +1,15 @@
+/******************************************************************************
+*   by Ha Xuan Tung
+*   Email: tung.haxuancs@gmail.com
+******************************************************************************
+*   Please don't clear this comments
+*   Copyright MTA 2017.
+*   Learn more in site: https://sites.google.com/site/ictw666/
+*   Youtube channel: https://goo.gl/Caj8Gj
+*****************************************************************************/
 #pragma once
 #include "iostream"
+#include "string"
 #include "fstream"
 #include <algorithm>
 #include <functional>
@@ -7,30 +17,22 @@
 #include <set>
 #include "opencv.hpp"
 
-
 struct ImageData
 {
 	std::string classname;
 	cv::Mat bowFeatures;
-};
-struct PredictResults
-{
-	std::vector<std::string> predicted;
-	std::vector<std::string> expected;
-	std::vector<std::string> path;
-	float accuracy;
 };
 class KAZERecognizor
 {
 	typedef std::vector<std::string>::const_iterator vec_iter;
 public:
 	KAZERecognizor();
-	cv::Mat getDescriptors(const cv::Mat& img);
+	KAZERecognizor(std::string path);
 
 	void Train(const std::string& imagesDirect, int netInputSize);
-	std::string Predict(const cv::Mat& src);
+	float Predict(cv::Mat src);
 private:
-
+	cv::Mat getDescriptors(const cv::Mat& img);
 	std::vector<ImageData*> descriptorsMetadata;
 	std::set<std::string> classes;
 	cv::FlannBasedMatcher flann;
@@ -38,6 +40,7 @@ private:
 	cv::Mat vocabulary;
 	int networkInputSize = 32;
 
+	std::string pathImage;
+
 	void readImages(vec_iter begin, vec_iter end, std::function<void(const std::string&, const cv::Mat&)> callback);
 };
-

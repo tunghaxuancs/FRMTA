@@ -1,6 +1,64 @@
+/******************************************************************************
+*   by Ha Xuan Tung
+*   Email: tung.haxuancs@gmail.com
+******************************************************************************
+*   Please don't clear this comments
+*   Copyright MTA 2017.
+*   Learn more in site: https://sites.google.com/site/ictw666/
+*   Youtube channel: https://goo.gl/Caj8Gj
+*****************************************************************************/
 #include "Server.h"
+#include <experimental/filesystem>
 
-ReceiverSocket::ReceiverSocket(const int port_number){
+inline std::string getName(const std::string& filename)
+{
+	return filename.substr(filename.find_last_of('\\') + 1);
+}
+
+std::string wchar2string(const wchar_t *wchar)
+{
+	std::string str = "";
+	int index = 0;
+	while (wchar[index] != 0)
+	{
+		str += (char)wchar[index];
+		++index;
+	}
+	return str;
+}
+
+wchar_t *string2wchar(const std::string &str)
+{
+	wchar_t wchar[260];
+	int index = 0;
+	while (index < str.size())
+	{
+		wchar[index] = (wchar_t)str[index];
+		++index;
+	}
+	wchar[index] = 0;
+	return wchar;
+}
+
+std::vector<std::string> getDirectory(const std::string& directory)
+{
+	std::string search_path = directory + "/*.*";
+	WIN32_FIND_DATA FindFileData;
+	wchar_t * FileName = string2wchar(search_path);
+	HANDLE hFind = FindFirstFile(FileName, &FindFileData);
+	std::vector<std::string> listFileNames;
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		do {
+			if ((FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				listFileNames.push_back(wchar2string(FindFileData.cFileName));
+			}
+		} while (::FindNextFile(hFind, &FindFileData));
+		::FindClose(hFind);
+	}
+	return listFileNames;
+}
+ReceiverSocket::ReceiverSocket(const int port_number) {
 	Port = (unsigned short)port_number;
 	WSADATA wsaDataReci;
 	int iResult = 0;
@@ -56,8 +114,7 @@ void ReceiverSocket::GetPacket() {
 		clients.insert(client);
 	}
 }
-void ReceiverSocket::SendPacket(MessageData message, std::string nameClient){
-
+void ReceiverSocket::SendPacket(MessageData message, std::string nameClient) {
 	sockaddr_in RecvAddr;
 	WSADATA wsaDataSend;
 	for (auto client : clients)
@@ -87,23 +144,26 @@ void ReceiverSocket::SendPacket(MessageData message, std::string nameClient){
 }
 void ReceiverSocket::Run()
 {
-	/*std::thread getPacket(&ReceiverSocket::GetPacket, this);
-	getPacket.detach();*/
-	std::thread processPacket(&ReceiverSocket::ProcessPacket, this);
-	processPacket.detach();
-
-	GetPacket();
+	std::thread getPacket(&ReceiverSocket::GetPacket, this);
+	getPacket.detach();
+	/*std::thread processPacket(&ReceiverSocket::ProcessPacket, this);
+	processPacket.detach();*/
+	InitModel();
+	ProcessPacket();
 }
+
 void ReceiverSocket::ProcessPacket()
 {
 	int index = 0;
+
 	while (true)
 	{
 		if (incomingMessages.empty()) continue;
-
 		MessageData message = incomingMessages.pop();
 		std::string path = "data\\face\\train";
 		MessageData messageSend;
+		float maxPredict = -1;
+		int maxIndex = 0;
 		switch (message.typeConnect)
 		{
 		case Login:
@@ -125,10 +185,19 @@ void ReceiverSocket::ProcessPacket()
 			break;
 		case Predict:
 			messageSend.typeConnect = Predict;
-			std::cout << "Start predict...\n";
-			messageSend.clientName = recognizor.Predict(message.message);
+			if (models.size() == 0) continue;
+			for (int i = 0;i < directories.size();i++)
+			{
+				KAZERecognizor kaze(directories.at(i));
+				float temp = kaze.Predict(message.message);
+				if (temp > maxPredict)
+				{
+					maxPredict = temp;
+					maxIndex = i;
+				}
+			}
 
-			std::cout << "Send result...\n";
+			messageSend.clientName = getName(directories.at(maxIndex));
 			SendPacket(messageSend, message.clientName);
 			break;
 		default:
@@ -137,4 +206,16 @@ void ReceiverSocket::ProcessPacket()
 	}
 }
 
+void ReceiverSocket::InitModel()
+{
+	std::string path = "data/face/data";
 
+	/*std::experimental::filesystem::path path(pathString);*/
+	for (auto & p : std::experimental::filesystem::directory_iterator(path))
+	{
+		std::string rootPath = p.path().string();
+		directories.push_back(rootPath);
+		KAZERecognizor kaze(rootPath);
+		models.push_back(kaze);
+	}
+}

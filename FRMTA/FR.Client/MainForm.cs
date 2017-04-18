@@ -1,4 +1,14 @@
-﻿using Emgu.CV;
+﻿/******************************************************************************
+*   by Ha Xuan Tung
+*   Email: tung.haxuancs@gmail.com
+******************************************************************************
+*   Please don't clear this comments
+*   Copyright MTA 2017.
+*   Learn more in site: https://sites.google.com/site/ictw666/
+*   Youtube channel: https://goo.gl/Caj8Gj
+*****************************************************************************/
+
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using FR.Client.Scripts;
@@ -24,7 +34,7 @@ namespace FR.Client
 {
     public partial class MainForm : DevExpress.XtraBars.Ribbon.RibbonForm
     {
-        private Capture camera;
+        private VideoCapture camera;
         private Log appLog;
         private Mat currentCameraFrame;
         private Mat currentPredict;
@@ -46,14 +56,17 @@ namespace FR.Client
         private string clientName;
         private EndPoint serverEndPoint;
 
-        byte[] dataRecieve = new byte[4096];
-        byte[] dataSend = new byte[4096];
+        private byte[] dataRecieve = new byte[4096];
+        private byte[] dataSend = new byte[4096];
 
         private int numRecord;
 
         private AppMode mode;
         private FaceDataRepositories faceRepo;
         private CustomerRepositories cusRepo;
+
+        private VideoWriter videoW;
+
         public MainForm()
         {
             InitializeComponent();
@@ -63,6 +76,7 @@ namespace FR.Client
             InitCamera();
             InitConnectServer();
         }
+
         private void Init()
         {
             appLog = new Log();
@@ -76,7 +90,6 @@ namespace FR.Client
             fdh = new FaceDetectHaar();
             odh = new ObjectDetectHaar();
 
-
             listDataSource = new BindingList<Record>();
             gcDisplayDetect.DataSource = listDataSource;
 
@@ -86,20 +99,29 @@ namespace FR.Client
             mode = AppMode.Predict;
             faceRepo = new FaceDataRepositories();
             cusRepo = new CustomerRepositories();
+
+            videoW = new VideoWriter(HelperFeature.pathLogVideo + "\\" + DateTime.Now.ToFileName() + ".avi",
+                                   16,
+                                   new Size(HelperFeature.Camera_Width,
+                                   HelperFeature.Camera_Height),
+                                   true);
         }
+
         private void InitDirectories()
         {
             if (!Directory.Exists(HelperFeature.pathSaveImage)) Directory.CreateDirectory(HelperFeature.pathSaveImage);
             if (!Directory.Exists(HelperFeature.pathSaveVideo)) Directory.CreateDirectory(HelperFeature.pathSaveVideo);
             if (!Directory.Exists(HelperFeature.pathLogApp)) Directory.CreateDirectory(HelperFeature.pathLogApp);
             if (!Directory.Exists(HelperFeature.pathLogSensor)) Directory.CreateDirectory(HelperFeature.pathLogSensor);
+            if (!Directory.Exists(HelperFeature.pathLogVideo)) Directory.CreateDirectory(HelperFeature.pathLogVideo);
         }
+
         private void InitCamera()
         {
             Log sensorLog = new Log(false);
             try
             {
-                camera = new Capture();
+                camera = new VideoCapture();
                 camera.SetCaptureProperty(CapProp.FrameWidth, HelperFeature.Camera_Width);
                 camera.SetCaptureProperty(CapProp.FrameHeight, HelperFeature.Camera_Height);
                 camera.Start();
@@ -107,7 +129,6 @@ namespace FR.Client
                 lbCameraStatus.Text = "Camera: Connected";
                 lbCameraStatus.Appearance.ForeColor = Color.Green;
                 lbStatusDisplayCamera.Text = "Connected";
-
 
                 Application.Idle += new EventHandler(ProcessFrame);
                 sensorLog.WriteLog("Connect Camera Success");
@@ -117,8 +138,8 @@ namespace FR.Client
                 lbCameraStatus.Text = "No Connected";
                 sensorLog.WriteLog("Connect Camera Error " + ex.Message);
             }
-
         }
+
         private void InitCascadeClassifier()
         {
             try
@@ -132,6 +153,7 @@ namespace FR.Client
                 appLog.WriteLog("Create CascadeClassifier Error " + ex.Message);
             }
         }
+
         private void InitConnectServer()
         {
             clientSocket = new Socket(AddressFamily.InterNetwork,
@@ -150,6 +172,7 @@ namespace FR.Client
             SendMessage(msgToSend);
             ReceiveMessage();
         }
+
         private void ProcessFrame(object sender, EventArgs e)
         {
             currentCameraFrame = camera.QueryFrame();
@@ -166,13 +189,15 @@ namespace FR.Client
             ibMain.Image = displayCameraFrame;
 
             ReceiveMessage();
+            videoW.Write(displayCameraFrame);
         }
+
         private void FPS_Time_Tick(object sender, EventArgs e)
         {
             lbFPSCamera.Text = "FPS:" + FPS_Count.ToString();
             FPS_Count = 0;
 
-            if (fdh.faceRect != null && faceData != null && faceData.Length == fdh.faceRect.Length)
+            if (fdh.faceRect != null && faceData != null && faceData.Length == fdh.faceRect.Length && mode != AppMode.Logout)
             {
                 for (int i = 0; i < fdh.faceRect.Length; i++)
                 {
@@ -199,11 +224,10 @@ namespace FR.Client
                         currentPredict = new Mat();
                     }
                     else continue;
-
                 }
             }
-
         }
+
         private void SendMessage(DataMessage msgToSend)
         {
             dataSend = new byte[2048];
@@ -212,7 +236,6 @@ namespace FR.Client
                 dataSend = msgToSend.ToByte();
                 clientSocket.BeginSendTo(dataSend, 0, dataSend.Length, SocketFlags.None,
                     serverEndPoint, new AsyncCallback(OnSend), null);
-
             }
             catch (Exception e)
             {
@@ -220,6 +243,7 @@ namespace FR.Client
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void OnSend(IAsyncResult ar)
         {
             try
@@ -234,6 +258,7 @@ namespace FR.Client
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void ReceiveMessage()
         {
             //dataRecieve = new byte[2048];
@@ -248,6 +273,7 @@ namespace FR.Client
                 lbServerStatus.Appearance.ForeColor = Color.Red;
             }
         }
+
         private void OnReceive(IAsyncResult ar)
         {
             try
@@ -261,14 +287,21 @@ namespace FR.Client
                         lbServerStatus.Text = "Server: Connected";
                         lbServerStatus.Appearance.ForeColor = Color.Green;
                         break;
+
+                    case TypeConnect.Logout:
+                        lbServerStatus.Text = "Server: Disconnected";
+                        lbServerStatus.Appearance.ForeColor = Color.Red;
+                        mode = AppMode.Logout;
+                        break;
+
                     case TypeConnect.Predict:
                         try
                         {
                             int.Parse(_msgReceived.clientName);
                             DataTable customer = cusRepo.SelectData("ID='" + _msgReceived.clientName + "'");
-                            currentInfo = customer.Rows[0]["FullName"].ToString();
+                            currentInfo = customer.Rows[0]["FullName"].ToString() + "\n" + customer.Rows[0]["Address"].ToString();
                             string pathTemp = HelperFeature.pathSaveImage + _msgReceived.clientName + "/avatar.png";
-                            if (File.Exists(pathTemp)) currentPredict = CvInvoke.Imread(pathTemp, LoadImageType.Color);
+                            if (File.Exists(pathTemp)) currentPredict = CvInvoke.Imread(pathTemp, ImreadModes.Color);
                         }
                         catch { break; }
                         break;
@@ -278,8 +311,6 @@ namespace FR.Client
             { }
             catch (Exception ex)
             {
-                //lbServerStatus.Text = "Server: Disconnect";
-                //MessageBox.Show(ex.Message, "Receiving", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
         }
@@ -372,7 +403,7 @@ namespace FR.Client
                     {
                         Image<Gray, Byte> imageCV = new Image<Gray, byte>(selectedRows[i].DetectImg);
                         DataMessage msgToSend = new DataMessage();
-                        msgToSend.clientName = this.clientName;
+                        msgToSend.clientName = selectedRows[i].Info + "%";
                         msgToSend.message = imageCV.Mat;
                         msgToSend.typeConnect = TypeConnect.Report;
 
@@ -388,6 +419,7 @@ namespace FR.Client
         {
             showNewestRow();
         }
+
         private void showNewestRow()
         {
             if (gridView1.GetSelectedRows().Length > 0) return;
@@ -396,6 +428,7 @@ namespace FR.Client
             gridView1.TopRowIndex = value;
             gridView1.FocusedRowHandle = value;
         }
+
         private void gridView1_RowCountChanged(object sender, EventArgs e)
         {
             showNewestRow();

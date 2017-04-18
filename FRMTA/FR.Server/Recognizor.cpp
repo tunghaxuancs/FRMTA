@@ -1,5 +1,14 @@
+/******************************************************************************
+*   by Ha Xuan Tung
+*   Email: tung.haxuancs@gmail.com
+******************************************************************************
+*   Please don't clear this comments
+*   Copyright MTA 2017.
+*   Learn more in site: https://sites.google.com/site/ictw666/
+*   Youtube channel: https://goo.gl/Caj8Gj
+*****************************************************************************/
 #include "Recognizor.h"
-#include <windows.h>
+#include "windows.h"
 
 std::string wchar_t2string(const wchar_t *wchar)
 {
@@ -32,7 +41,6 @@ inline std::string getDirName(const std::string& filename)
 
 std::vector<std::string> getFilesInDirectory(const std::string& directory)
 {
-
 	WIN32_FIND_DATA FindFileData;
 	wchar_t * FileName = string2wchar_t(directory);
 	HANDLE hFind = FindFirstFile(FileName, &FindFileData);
@@ -50,7 +58,6 @@ std::vector<std::string> getFilesInDirectory(const std::string& directory)
 */
 inline std::string getClassName(const std::string& filename)
 {
-
 	int s = filename.find_last_of('\\');
 	if (s == -1)
 	{
@@ -114,7 +121,7 @@ cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat& trainSamples,
 	return mlp;
 }
 
-int getPredictedClass(const cv::Mat& predictions)
+float getPredictedClass(const cv::Mat& predictions)
 {
 	float maxPrediction = predictions.at<float>(0);
 	float maxPredictionIndex = 0;
@@ -128,63 +135,26 @@ int getPredictedClass(const cv::Mat& predictions)
 			maxPredictionIndex = i;
 		}
 	}
-	return (maxPrediction > 0.0) ? maxPredictionIndex : -1;
+	return maxPrediction;
 }
 
-/**
-* Get a confusion matrix from a set of test samples and their expected
-* outputs
-*/
-std::vector<std::vector<int> > getConfusionMatrix(cv::Ptr<cv::ml::ANN_MLP> mlp,
-	const cv::Mat& testSamples, const std::vector<int>& testOutputExpected, const std::set<std::string>& classes,
-	PredictResults& results)
+void printConfusionMatrix(const std::vector<std::vector<int> >& confusionMatrix,
+	const std::set<std::string>& classes)
 {
-	cv::Mat testOutput;
-	mlp->predict(testSamples, testOutput);
-	std::vector<std::vector<int> > confusionMatrix(classes.size(), std::vector<int>(classes.size()));
-	for (int i = 0; i < testOutput.rows; i++)
+	for (auto it = classes.begin(); it != classes.end(); ++it)
 	{
-		int predictedClass = getPredictedClass(testOutput.row(i));
-		int expectedClass = testOutputExpected.at(i);
-
-		if (predictedClass != -1 && expectedClass < classes.size())
-		{
-			std::set<std::string>::iterator it = classes.begin();
-
-			std::advance(it, predictedClass);
-			results.predicted.push_back(*it);
-
-			it = classes.begin();
-			std::advance(it, expectedClass);
-			results.expected.push_back(*it);
-
-			confusionMatrix[expectedClass][predictedClass]++;
-		}
-		else
-		{
-			results.predicted.push_back("Khong co du lieu"); results.expected.push_back("Khong co du lieu");
-		}
+		std::cout << *it << " ";
 	}
-	return confusionMatrix;
+	std::cout << std::endl;
+	for (size_t i = 0; i < confusionMatrix.size(); i++)
+	{
+		for (size_t j = 0; j < confusionMatrix[i].size(); j++)
+		{
+			std::cout << confusionMatrix[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
 }
-
-//void printConfusionMatrix(const std::vector<std::vector<int> >& confusionMatrix,
-//	const std::set<std::string>& classes)
-//{
-//	for (auto it = classes.begin(); it != classes.end(); ++it)
-//	{
-//		std::cout << *it << " ";
-//	}
-//	std::cout << std::endl;
-//	for (size_t i = 0; i < confusionMatrix.size(); i++)
-//	{
-//		for (size_t j = 0; j < confusionMatrix[i].size(); j++)
-//		{
-//			std::cout << confusionMatrix[i][j] << " ";
-//		}
-//		std::cout << std::endl;
-//	}
-//}
 
 /**
 * Get the accuracy for a model (i.e., percentage of correctly predicted
@@ -210,14 +180,14 @@ float getAccuracy(const std::vector<std::vector<int> >& confusionMatrix)
 * and class names) to use it later
 */
 void saveModels(cv::Ptr<cv::ml::ANN_MLP> mlp, const cv::Mat& vocabulary,
-	const std::set<std::string>& classes)
+	const std::set<std::string>& classes, const std::string& path)
 {
-	mlp->save("mlp.yml");
+	mlp->save(path + "\\mlp.yml");
 
-	cv::FileStorage fs("vocabulary.yaml", cv::FileStorage::WRITE);
+	cv::FileStorage fs(path + "\\vocabulary.yaml", cv::FileStorage::WRITE);
 	fs << "vocabulary" << vocabulary;
 	fs.release();
-	std::ofstream classesOutput("classes.txt");
+	std::ofstream classesOutput(path + "\\classes.txt");
 	for (auto it = classes.begin(); it != classes.end(); ++it)
 	{
 		classesOutput << getClassId(classes, *it) << "\t" << *it << std::endl;
@@ -225,18 +195,18 @@ void saveModels(cv::Ptr<cv::ml::ANN_MLP> mlp, const cv::Mat& vocabulary,
 	classesOutput.close();
 }
 
-
-
 void loadModels(cv::Ptr<cv::ml::ANN_MLP>& mlp, cv::Mat& vocabulary,
-	std::set<std::string>& classes)
+	std::set<std::string>& classes, const std::string& path)
 {
-	mlp = cv::Algorithm::load<cv::ml::ANN_MLP>("mlp.yml");
+	/*FileStorage ffs("mlp.yml", FileStorage::READ);
+	mlp = cv::Algorithm::read<cv::ml::ANN_MLP>(ffs.root());*/
+	mlp = cv::Algorithm::load<cv::ml::ANN_MLP>(path + "\\mlp.yml");
 
-	cv::FileStorage fs("vocabulary.yaml", cv::FileStorage::READ);
+	cv::FileStorage fs(path + "\\vocabulary.yaml", cv::FileStorage::READ);
 	fs["vocabulary"] >> vocabulary;
 	fs.release();
 
-	std::ifstream classesIutput("classes.txt", std::ifstream::in);
+	std::ifstream classesIutput(path + "\\classes.txt", std::ifstream::in);
 	if (classesIutput.is_open())
 	{
 		std::string line;
@@ -251,6 +221,21 @@ void loadModels(cv::Ptr<cv::ml::ANN_MLP>& mlp, cv::Mat& vocabulary,
 
 KAZERecognizor::KAZERecognizor()
 {
+}
+
+KAZERecognizor::KAZERecognizor(std::string path)
+{
+	pathImage = path;
+	if (mlp == NULL)
+	{
+		loadModels(mlp, vocabulary, classes, pathImage);
+		flann.add(vocabulary);
+		flann.train();
+	}
+	if (mlp == NULL)
+	{
+		Train(pathImage, 32);
+	}
 }
 
 cv::Mat KAZERecognizor::getDescriptors(const cv::Mat& img)
@@ -273,7 +258,7 @@ void KAZERecognizor::readImages(vec_iter begin, vec_iter end, std::function<void
 		{
 			continue;
 		}
-		cv::resize(img, img, cv::Size(240, 240));
+
 		std::string classname = getClassName(filename);
 		cv::Mat descriptors = getDescriptors(img);
 		callback(classname, descriptors);
@@ -286,7 +271,6 @@ void KAZERecognizor::Train(const std::string& imagesDirect, int netInputSize)
 	networkInputSize = netInputSize;
 
 	std::vector<std::string> files = getFilesInDirectory(imagesDir + "\\*.png");
-
 	cv::Mat descriptorsSet;
 
 	readImages(files.begin(), files.end(),
@@ -305,7 +289,7 @@ void KAZERecognizor::Train(const std::string& imagesDirect, int netInputSize)
 			descriptorsMetadata.push_back(data);
 		}
 	});
-	if (descriptorsSet.empty()) return;
+
 	cv::Mat labels;
 	// Use k-means to find k centroids (the words of our vocabulary)
 	cv::kmeans(descriptorsSet, networkInputSize, labels, cv::TermCriteria(cv::TermCriteria::EPS +
@@ -345,21 +329,14 @@ void KAZERecognizor::Train(const std::string& imagesDirect, int netInputSize)
 	flann.add(vocabulary);
 	flann.train();
 
-	saveModels(mlp, vocabulary, classes);
+	saveModels(mlp, vocabulary, classes, pathImage);
 }
 
-std::string KAZERecognizor::Predict(const cv::Mat& src)
+float KAZERecognizor::Predict(cv::Mat src)
 {
-	if (src.empty()) return "";
-
-	if (mlp == NULL){
-		loadModels(mlp, vocabulary, classes);
-		flann.add(vocabulary);
-		flann.train();
-	}
-
 	cv::Mat testSamples;
 	cv::Mat descriptors = getDescriptors(src);
+
 	cv::Mat bowFeatures = getBOWFeatures(flann, descriptors, networkInputSize);
 	cv::normalize(bowFeatures, bowFeatures, 0, bowFeatures.rows, cv::NORM_MINMAX, -1, cv::Mat());
 	testSamples.push_back(bowFeatures);
@@ -367,16 +344,5 @@ std::string KAZERecognizor::Predict(const cv::Mat& src)
 	cv::Mat testOutput;
 	mlp->predict(testSamples, testOutput);
 
-	if (testOutput.rows > 0)
-	{
-		int predictedClass = getPredictedClass(testOutput.row(0));
-		if (predictedClass != -1)
-		{
-			std::set<std::string>::iterator it = classes.begin();
-
-			std::advance(it, predictedClass);
-			return *it;
-		}
-	}
-	else return "";
+	return getPredictedClass(testOutput.row(0));
 }

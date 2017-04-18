@@ -37,9 +37,8 @@
             this.barButtonItem4 = new DevExpress.XtraBars.BarButtonItem();
             this.btnAppLog = new DevExpress.XtraBars.BarButtonItem();
             this.btnSensorLog = new DevExpress.XtraBars.BarButtonItem();
-            this.barButtonItem7 = new DevExpress.XtraBars.BarButtonItem();
+            this.btnFRHistory = new DevExpress.XtraBars.BarButtonItem();
             this.ay = new DevExpress.XtraBars.BarButtonItem();
-            this.barButtonItem8 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem9 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem10 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem11 = new DevExpress.XtraBars.BarButtonItem();
@@ -113,9 +112,8 @@
             this.barButtonItem4,
             this.btnAppLog,
             this.btnSensorLog,
-            this.barButtonItem7,
+            this.btnFRHistory,
             this.ay,
-            this.barButtonItem8,
             this.barButtonItem9,
             this.barButtonItem10,
             this.barButtonItem11,
@@ -129,12 +127,12 @@
             this.ribbonPage1,
             this.ribbonPage3,
             this.ribbonPage2});
-            this.ribbonControl1.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonControlStyle.TabletOfficeEx;
-            this.ribbonControl1.Size = new System.Drawing.Size(1250, 80);
-            this.ribbonControl1.Toolbar.ItemLinks.Add(this.barButtonItem1);
-            this.ribbonControl1.Toolbar.ItemLinks.Add(this.barButtonItem2);
-            this.ribbonControl1.Toolbar.ItemLinks.Add(this.barButtonItem3);
-            this.ribbonControl1.Toolbar.ItemLinks.Add(this.barButtonItem4);
+            this.ribbonControl1.QuickToolbarItemLinks.Add(this.barButtonItem1);
+            this.ribbonControl1.QuickToolbarItemLinks.Add(this.barButtonItem2);
+            this.ribbonControl1.QuickToolbarItemLinks.Add(this.barButtonItem3);
+            this.ribbonControl1.QuickToolbarItemLinks.Add(this.barButtonItem4);
+            this.ribbonControl1.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonControlStyle.OfficeUniversal;
+            this.ribbonControl1.Size = new System.Drawing.Size(1250, 79);
             // 
             // barButtonItem1
             // 
@@ -178,13 +176,13 @@
             this.btnSensorLog.Name = "btnSensorLog";
             this.btnSensorLog.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnSensorLog_ItemClick);
             // 
-            // barButtonItem7
+            // btnFRHistory
             // 
-            this.barButtonItem7.Caption = "FR History";
-            this.barButtonItem7.Glyph = ((System.Drawing.Image)(resources.GetObject("barButtonItem7.Glyph")));
-            this.barButtonItem7.Id = 7;
-            this.barButtonItem7.LargeGlyph = ((System.Drawing.Image)(resources.GetObject("barButtonItem7.LargeGlyph")));
-            this.barButtonItem7.Name = "barButtonItem7";
+            this.btnFRHistory.Caption = "FR History";
+            this.btnFRHistory.Glyph = ((System.Drawing.Image)(resources.GetObject("btnFRHistory.Glyph")));
+            this.btnFRHistory.Id = 7;
+            this.btnFRHistory.LargeGlyph = ((System.Drawing.Image)(resources.GetObject("btnFRHistory.LargeGlyph")));
+            this.btnFRHistory.Name = "btnFRHistory";
             // 
             // ay
             // 
@@ -193,14 +191,6 @@
             this.ay.Id = 8;
             this.ay.LargeGlyph = ((System.Drawing.Image)(resources.GetObject("ay.LargeGlyph")));
             this.ay.Name = "ay";
-            // 
-            // barButtonItem8
-            // 
-            this.barButtonItem8.Caption = "Search";
-            this.barButtonItem8.Glyph = ((System.Drawing.Image)(resources.GetObject("barButtonItem8.Glyph")));
-            this.barButtonItem8.Id = 9;
-            this.barButtonItem8.LargeGlyph = ((System.Drawing.Image)(resources.GetObject("barButtonItem8.LargeGlyph")));
-            this.barButtonItem8.Name = "barButtonItem8";
             // 
             // barButtonItem9
             // 
@@ -264,9 +254,8 @@
             // 
             // ribbonPageGroup2
             // 
-            this.ribbonPageGroup2.ItemLinks.Add(this.barButtonItem7);
+            this.ribbonPageGroup2.ItemLinks.Add(this.btnFRHistory);
             this.ribbonPageGroup2.ItemLinks.Add(this.ay);
-            this.ribbonPageGroup2.ItemLinks.Add(this.barButtonItem8);
             this.ribbonPageGroup2.Name = "ribbonPageGroup2";
             this.ribbonPageGroup2.Text = "History";
             // 
@@ -314,21 +303,11 @@
             this.layoutControl1.Controls.Add(this.lbDateFrame);
             this.layoutControl1.Controls.Add(this.lbStatusDisplayCamera);
             this.layoutControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.layoutControl1.Location = new System.Drawing.Point(0, 80);
+            this.layoutControl1.Location = new System.Drawing.Point(0, 79);
             this.layoutControl1.Name = "layoutControl1";
             this.layoutControl1.OptionsCustomizationForm.DesignTimeCustomizationFormPositionAndSize = new System.Drawing.Rectangle(116, 316, 250, 350);
-            this.layoutControl1.OptionsPrint.AppearanceGroupCaption.BackColor = System.Drawing.Color.LightGray;
-            this.layoutControl1.OptionsPrint.AppearanceGroupCaption.Font = new System.Drawing.Font("Tahoma", 10.25F);
-            this.layoutControl1.OptionsPrint.AppearanceGroupCaption.Options.UseBackColor = true;
-            this.layoutControl1.OptionsPrint.AppearanceGroupCaption.Options.UseFont = true;
-            this.layoutControl1.OptionsPrint.AppearanceGroupCaption.Options.UseTextOptions = true;
-            this.layoutControl1.OptionsPrint.AppearanceGroupCaption.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.layoutControl1.OptionsPrint.AppearanceGroupCaption.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.layoutControl1.OptionsPrint.AppearanceItemCaption.Options.UseTextOptions = true;
-            this.layoutControl1.OptionsPrint.AppearanceItemCaption.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near;
-            this.layoutControl1.OptionsPrint.AppearanceItemCaption.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
             this.layoutControl1.Root = this.layoutControlGroup1;
-            this.layoutControl1.Size = new System.Drawing.Size(1250, 515);
+            this.layoutControl1.Size = new System.Drawing.Size(1250, 516);
             this.layoutControl1.TabIndex = 1;
             this.layoutControl1.Text = "layoutControl1";
             // 
@@ -337,7 +316,7 @@
             this.ibMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.ibMain.Location = new System.Drawing.Point(12, 29);
             this.ibMain.Name = "ibMain";
-            this.ibMain.Size = new System.Drawing.Size(892, 457);
+            this.ibMain.Size = new System.Drawing.Size(892, 458);
             this.ibMain.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.ibMain.TabIndex = 2;
             this.ibMain.TabStop = false;
@@ -357,7 +336,7 @@
             this.lbCameraStatus.Appearance.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.lbCameraStatus.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.lbCameraStatus.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
-            this.lbCameraStatus.Location = new System.Drawing.Point(908, 490);
+            this.lbCameraStatus.Location = new System.Drawing.Point(908, 491);
             this.lbCameraStatus.Name = "lbCameraStatus";
             this.lbCameraStatus.Size = new System.Drawing.Size(175, 13);
             this.lbCameraStatus.StyleController = this.layoutControl1;
@@ -368,7 +347,7 @@
             // 
             this.lbServerStatus.Appearance.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.lbServerStatus.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
-            this.lbServerStatus.Location = new System.Drawing.Point(1087, 490);
+            this.lbServerStatus.Location = new System.Drawing.Point(1087, 491);
             this.lbServerStatus.Name = "lbServerStatus";
             this.lbServerStatus.Size = new System.Drawing.Size(151, 13);
             this.lbServerStatus.StyleController = this.layoutControl1;
@@ -385,7 +364,7 @@
             this.repositoryItemPictureEdit1,
             this.repositoryItemPictureEdit2,
             this.repositoryItemPictureEdit3});
-            this.gcDisplayDetect.Size = new System.Drawing.Size(330, 474);
+            this.gcDisplayDetect.Size = new System.Drawing.Size(330, 475);
             this.gcDisplayDetect.TabIndex = 10;
             this.gcDisplayDetect.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -400,6 +379,7 @@
             this.gridColumn4});
             this.gridView1.GridControl = this.gcDisplayDetect;
             this.gridView1.Name = "gridView1";
+            this.gridView1.OptionsDetail.DetailMode = DevExpress.XtraGrid.Views.Grid.DetailMode.Default;
             this.gridView1.OptionsSelection.CheckBoxSelectorColumnWidth = 20;
             this.gridView1.OptionsSelection.MultiSelect = true;
             this.gridView1.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CheckBoxRowSelect;
@@ -424,6 +404,7 @@
             this.repositoryItemPictureEdit1.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.HotFlat;
             this.repositoryItemPictureEdit1.Name = "repositoryItemPictureEdit1";
             this.repositoryItemPictureEdit1.SizeMode = DevExpress.XtraEditors.Controls.PictureSizeMode.Zoom;
+            this.repositoryItemPictureEdit1.ZoomAccelerationFactor = 1D;
             // 
             // gridColumn2
             // 
@@ -440,6 +421,7 @@
             this.repositoryItemPictureEdit2.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.HotFlat;
             this.repositoryItemPictureEdit2.Name = "repositoryItemPictureEdit2";
             this.repositoryItemPictureEdit2.SizeMode = DevExpress.XtraEditors.Controls.PictureSizeMode.Zoom;
+            this.repositoryItemPictureEdit2.ZoomAccelerationFactor = 1D;
             // 
             // gridColumn5
             // 
@@ -447,14 +429,13 @@
             this.gridColumn5.ColumnEdit = this.repositoryItemPictureEdit3;
             this.gridColumn5.FieldName = "PreProcessImg";
             this.gridColumn5.Name = "gridColumn5";
-            this.gridColumn5.Visible = true;
-            this.gridColumn5.VisibleIndex = 4;
             this.gridColumn5.Width = 62;
             // 
             // repositoryItemPictureEdit3
             // 
             this.repositoryItemPictureEdit3.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.HotFlat;
             this.repositoryItemPictureEdit3.Name = "repositoryItemPictureEdit3";
+            this.repositoryItemPictureEdit3.ZoomAccelerationFactor = 1D;
             // 
             // gridColumn3
             // 
@@ -462,7 +443,7 @@
             this.gridColumn3.FieldName = "Info";
             this.gridColumn3.Name = "gridColumn3";
             this.gridColumn3.Visible = true;
-            this.gridColumn3.VisibleIndex = 5;
+            this.gridColumn3.VisibleIndex = 4;
             this.gridColumn3.Width = 94;
             // 
             // gridColumn4
@@ -509,7 +490,7 @@
             this.layoutControlItem5});
             this.layoutControlGroup1.Location = new System.Drawing.Point(0, 0);
             this.layoutControlGroup1.Name = "Root";
-            this.layoutControlGroup1.Size = new System.Drawing.Size(1250, 515);
+            this.layoutControlGroup1.Size = new System.Drawing.Size(1250, 516);
             this.layoutControlGroup1.TextVisible = false;
             // 
             // layoutControlItem4
@@ -526,14 +507,14 @@
             this.layoutControlItem7.Control = this.gcDisplayDetect;
             this.layoutControlItem7.Location = new System.Drawing.Point(896, 0);
             this.layoutControlItem7.Name = "layoutControlItem7";
-            this.layoutControlItem7.Size = new System.Drawing.Size(334, 478);
+            this.layoutControlItem7.Size = new System.Drawing.Size(334, 479);
             this.layoutControlItem7.TextSize = new System.Drawing.Size(0, 0);
             this.layoutControlItem7.TextVisible = false;
             // 
             // emptySpaceItem1
             // 
             this.emptySpaceItem1.AllowHotTrack = false;
-            this.emptySpaceItem1.Location = new System.Drawing.Point(0, 478);
+            this.emptySpaceItem1.Location = new System.Drawing.Point(0, 479);
             this.emptySpaceItem1.Name = "emptySpaceItem1";
             this.emptySpaceItem1.Size = new System.Drawing.Size(896, 17);
             this.emptySpaceItem1.TextSize = new System.Drawing.Size(0, 0);
@@ -541,7 +522,7 @@
             // layoutControlItem1
             // 
             this.layoutControlItem1.Control = this.lbServerStatus;
-            this.layoutControlItem1.Location = new System.Drawing.Point(1075, 478);
+            this.layoutControlItem1.Location = new System.Drawing.Point(1075, 479);
             this.layoutControlItem1.Name = "layoutControlItem1";
             this.layoutControlItem1.Size = new System.Drawing.Size(155, 17);
             this.layoutControlItem1.TextSize = new System.Drawing.Size(0, 0);
@@ -550,7 +531,7 @@
             // layoutControlItem2
             // 
             this.layoutControlItem2.Control = this.lbCameraStatus;
-            this.layoutControlItem2.Location = new System.Drawing.Point(896, 478);
+            this.layoutControlItem2.Location = new System.Drawing.Point(896, 479);
             this.layoutControlItem2.Name = "layoutControlItem2";
             this.layoutControlItem2.Size = new System.Drawing.Size(179, 17);
             this.layoutControlItem2.TextSize = new System.Drawing.Size(0, 0);
@@ -570,7 +551,7 @@
             this.layoutControlItem8.Control = this.ibMain;
             this.layoutControlItem8.Location = new System.Drawing.Point(0, 17);
             this.layoutControlItem8.Name = "layoutControlItem8";
-            this.layoutControlItem8.Size = new System.Drawing.Size(896, 461);
+            this.layoutControlItem8.Size = new System.Drawing.Size(896, 462);
             this.layoutControlItem8.TextSize = new System.Drawing.Size(0, 0);
             this.layoutControlItem8.TextVisible = false;
             // 
@@ -637,9 +618,8 @@
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup2;
         private DevExpress.XtraBars.BarButtonItem btnAppLog;
         private DevExpress.XtraBars.BarButtonItem btnSensorLog;
-        private DevExpress.XtraBars.BarButtonItem barButtonItem7;
+        private DevExpress.XtraBars.BarButtonItem btnFRHistory;
         private DevExpress.XtraBars.BarButtonItem ay;
-        private DevExpress.XtraBars.BarButtonItem barButtonItem8;
         private DevExpress.XtraBars.BarButtonItem barButtonItem9;
         private DevExpress.XtraBars.BarButtonItem barButtonItem10;
         private DevExpress.XtraBars.BarButtonItem barButtonItem11;
